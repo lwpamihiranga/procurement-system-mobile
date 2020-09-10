@@ -1,0 +1,45 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: SonarQubePrepare@4
+  inputs:
+    SonarQube: 'sonarqube-server'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: 'procurement-system-mobile'
+    cliProjectName: 'procurement-system-mobile'
+    cliSources: '.'
+
+- task: SonarQubeAnalyze@4
+
+- task: SonarQubePublish@4
+  inputs:
+    pollingTimeoutSec: '300'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $token = [System.Text.Encoding]::UTF8.GetBytes($env:SONARTOKEN + ":")
+      $base64 = [System.Convert]::ToBase64String($token)
+       
+      $basicAuth = [string]::Format("Basic {0}", $base64)
+      $headers = @{ Authorization = $basicAuth }
+       
+      $result = Invoke-RestMethod -Method Get -Uri http://172.105.52.97:9000/api/qualitygates/project_status?projectKey=procurement-system-mobile
+      $result | ConvertTo-Json | Write-Host
+       
+      if ($result.projectStatus.status -eq "OK") {
+      Write-Host "Quality Gate Succeeded"
+      }else{
+      throw "Quality gate failed"
+      }
