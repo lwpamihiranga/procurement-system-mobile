@@ -10,7 +10,7 @@ export function InquireDescPg({ navigation }){
     return(
         <View style={{ flex: 1, marginTop: 20}}>
 
-            
+
             	<View style={{
 				marginLeft: 20,
 				marginRight: 20,
@@ -91,7 +91,8 @@ export function InquireDescPg({ navigation }){
 						marginRight: 39,
 						marginTop: 80,
 						borderRadius: 5,	
-					}} >
+					}} onPress={() => Alert.alert('Successfully submitted')} >
+                        
 					<Text style={{color: "white", fontWeight: "bold", textAlign: "center"}}> Reply</Text>
 					</TouchableOpacity>
                 </View>
