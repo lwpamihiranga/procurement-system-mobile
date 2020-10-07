@@ -132,7 +132,7 @@ export function PurchaseRequestPage({ navigation }){
 						borderRadius: 5,
 						width: 115,
 						
-					}}>
+					}}  onPress={() => Alert.alert('Successfully submitted')} >
 						<Text style={{color: "white", fontWeight: "bold", textAlign: "center"}}>Inquire</Text>
 					</TouchableOpacity>
 
@@ -145,7 +145,7 @@ export function PurchaseRequestPage({ navigation }){
 						borderRadius: 5,
 						
 						
-					}} >
+					}}  onPress={() => Alert.alert('Successfully submitted')} >
 					<Text style={{color: "white", fontWeight: "bold", textAlign: "center"}}> View Inquire</Text>
 					</TouchableOpacity>
 				</View>
