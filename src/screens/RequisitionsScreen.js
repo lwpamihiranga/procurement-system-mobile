@@ -15,92 +15,112 @@ import {
 } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 import { ScrollView } from "react-native-gesture-handler";
+import DatePicker from "react-native-datepicker";
+import {
+  Table,
+  TableWrapper,
+  Row,
+  Rows,
+  Col,
+  Cols,
+  Cell,
+} from "react-native-table-component";
 
 export function RequisitionsScreen({ navigation }) {
+  let [date, setDate] = useState("2016-05-15");
+  let [tableHead, setTableHead] = useState([
+    "Item No",
+    "Cost",
+    "Quantity",
+    "Total Cost",
+    "Status",
+  ]);
+  let [tableData, setTableData] = useState([
+    ["0000-001", "8000.00", "5", "40,000", "Approved"],
+    ["0000-002", "8000.00", "5", "40,000", "Approved"],
+    ["0000-003", "8000.00", "5", "40,000", "Approved"],
+    ["Total Cost", "290,000"],
+  ]);
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.topHalf}>
         <TextInput
-          style={styles.titleInput}
-          placeholder="Exam Title"
+          style={styles.requisitionNoInput}
+          placeholder="Requisition No"
           placeholderTextColor="black"
         />
-        <View style={styles.hoursMins}>
-          <Picker style={styles.hoursPicker} mode="dropdown">
-            <Picker.Item label="Hours" value="-1" />
-            <Picker.Item label="1" value="1" />
-            <Picker.Item label="2" value="2" />
-            <Picker.Item label="3" value="3" />
-          </Picker>
-          <Ionicons
-            name="md-arrow-dropdown"
-            size={24}
-            color="black"
-            style={styles.smallLeftdropIcon}
-          />
-          <Picker style={styles.minsPicker}>
-            <Picker.Item label="Mins" value="-1" />
-            <Picker.Item label="00" value="00" />
-            <Picker.Item label="05" value="05" />
-            <Picker.Item label="10" value="10" />
-            <Picker.Item label="15" value="15" />
-            <Picker.Item label="20" value="20" />
-            <Picker.Item label="25" value="25" />
-            <Picker.Item label="30" value="30" />
-            <Picker.Item label="35" value="35" />
-            <Picker.Item label="40" value="40" />
-            <Picker.Item label="45" value="45" />
-            <Picker.Item label="50" value="50" />
-            <Picker.Item label="55" value="55" />
-          </Picker>
-          <Ionicons
-            name="md-arrow-dropdown"
-            size={24}
-            color="black"
-            style={styles.smallRightdropIcon}
+        <TextInput
+          style={styles.descriptionInput}
+          placeholder="Description"
+          placeholderTextColor="black"
+          multiline={true}
+          underlineColorAndroid="transparent"
+        />
+        <TextInput
+          style={styles.orderReferenceNoInput}
+          placeholder="Order Reference No"
+          placeholderTextColor="black"
+        />
+        <Picker style={styles.supplierCompanyDropdown}>
+          {/* set the proper values here */}
+          <Picker.Item label="Supplier Company" value="-1" />
+          <Picker.Item label="A" value="a" />
+          <Picker.Item label="B" value="b" />
+          <Picker.Item label="C" value="c" />
+        </Picker>
+        <Ionicons
+          name="md-arrow-dropdown"
+          size={24}
+          color="black"
+          style={styles.supplierCompanyDropIcon}
+        />
+        <TextInput
+          style={styles.commentsInput}
+          placeholder="Comments"
+          placeholderTextColor="black"
+          multiline={true}
+          underlineColorAndroid="transparent"
+        />
+        <View style={styles.deliverDate}>
+          <Text style={styles.dateText}>Deliver Before</Text>
+          <DatePicker
+            style={styles.dateInput}
+            date={date}
+            mode="date"
+            placeholder="select date"
+            format="YYYY-MM-DD"
+            minDate="2016-05-01"
+            maxDate="2016-06-01"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                position: "absolute",
+                left: 0,
+                top: 4,
+                marginLeft: 0,
+              },
+              dateInput: {
+                marginLeft: 36,
+              },
+            }}
+            onDateChange={setDate}
           />
         </View>
-        <Picker style={styles.levelsPicker}>
-          <Picker.Item label="Exam Level" value="-1" />
-          <Picker.Item label="O/L" value="O/L" />
-          <Picker.Item label="A/L" value="A/L" />
-          <Picker.Item label="Other" value="Other" />
-        </Picker>
-        <Ionicons
-          name="md-arrow-dropdown"
-          size={24}
-          color="black"
-          style={styles.bigTopdropIcon}
-        />
-        <Picker style={styles.mediumPicker}>
-          <Picker.Item label="Medium" value="-1" />
-          <Picker.Item label="Sinhala" value="Sinhala" />
-          <Picker.Item label="Tamil" value="Tamil" />
-          <Picker.Item label="English" value="English" />
-        </Picker>
-        <Ionicons
-          name="md-arrow-dropdown"
-          size={24}
-          color="black"
-          style={styles.bigBottomdropIcon}
-        />
       </View>
-      <View style={styles.middle}></View>
+
+      <ScrollView style={styles.tableContainer}>
+        <Table borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}>
+          <Row data={tableHead} style={styles.head} textStyle={styles.text} />
+          <Rows data={tableData} textStyle={styles.text} />
+        </Table>
+      </ScrollView>
       <View style={styles.lowerHalf}>
-        <TouchableOpacity style={styles.addQuestion}>
-          <AntDesign name="pluscircle" size={24} color="black" />
-          <Text style={styles.buttonText}>Add a new Question</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.saveExam}>
-          <MaterialCommunityIcons
-            name="content-save-settings"
-            size={24}
-            color="black"
-          />
-          <Text style={styles.buttonText}>Save Exam</Text>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Purchase Order</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -109,99 +129,86 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
-  topHalf: {
-    height: 300,
-  },
-  titleInput: {
-    marginTop: 50,
+  requisitionNoInput: {
+    marginTop: 20,
     borderWidth: 1,
     textAlign: "justify",
-    backgroundColor: "#E5E5E5",
     borderColor: "#E5E5E5",
-    marginHorizontal: 10,
+    marginHorizontal: 15,
     padding: 10,
     fontSize: 16,
   },
-  hoursMins: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 10,
+  descriptionInput: {
+    marginTop: 10,
+    borderWidth: 1,
+    textAlign: "justify",
+    borderColor: "#E5E5E5",
+    marginHorizontal: 15,
+    padding: 10,
+    fontSize: 16,
   },
-  hoursPicker: {
-    flex: 1,
+  orderReferenceNoInput: {
+    marginTop: 10,
+    borderWidth: 1,
+    textAlign: "justify",
+    borderColor: "#E5E5E5",
+    marginHorizontal: 15,
+    padding: 10,
+    fontSize: 16,
+  },
+  supplierCompanyDropdown: {
+    marginTop: 10,
+    marginBottom: 10,
+    marginHorizontal: 15,
+    backgroundColor: "#E5E5E5",
+    position: "relative",
+  },
+  supplierCompanyDropIcon: {
+    position: "absolute",
+    marginTop: 283,
+    marginStart: 370,
+  },
+  commentsInput: {
+    marginTop: 10,
+    borderWidth: 1,
+    textAlign: "justify",
+    borderColor: "#E5E5E5",
+    marginHorizontal: 15,
+    padding: 10,
+    fontSize: 16,
+  },
+  deliverDate: {
+    flexDirection: "row",
+    marginTop: 15,
+    marginHorizontal: 15,
+  },
+  dateText: {
     marginStart: 10,
-    backgroundColor: "#E5E5E5",
-    position: "relative",
+    fontSize: 16,
+    textAlignVertical: "center",
   },
-  smallLeftdropIcon: {
-    position: "absolute",
-    marginStart: 180,
-    marginTop: 13,
-  },
-  minsPicker: {
+  dateInput: {
     flex: 1,
-    marginHorizontal: 10,
-    backgroundColor: "#E5E5E5",
-    position: "relative",
+    borderColor: "#E5E5E5",
+    alignContent: "flex-end",
+    marginStart: 20,
   },
-  smallRightdropIcon: {
-    position: "absolute",
-    marginStart: 380,
-    marginTop: 13,
-  },
-  levelsPicker: {
+  tableContainer: {
     flex: 1,
-    backgroundColor: "#E5E5E5",
-    marginBottom: 10,
-    marginHorizontal: 10,
-    position: "relative",
+    padding: 16,
+    paddingTop: 30,
+    backgroundColor: "#fff",
+    height: 300,
   },
-  bigTopdropIcon: {
-    position: "absolute",
-    marginTop: 185,
-    marginStart: 377,
-  },
-  mediumPicker: {
-    flex: 1,
-    backgroundColor: "#E5E5E5",
-    marginBottom: 10,
-    marginHorizontal: 10,
-    position: "relative",
-  },
-  bigBottomdropIcon: {
-    position: "absolute",
-    marginTop: 250,
-    marginStart: 377,
-  },
-  middle: {
-    height: "45%",
-    marginBottom: 60,
-  },
-  lowerHalf: {
-    flexDirection: "row",
-    position: "absolute",
-    bottom: 0,
-    backgroundColor: "white",
-  },
-  addQuestion: {
-    width: "45%",
+  head: { height: 40, backgroundColor: "gray" },
+  text: { margin: 6 },
+  button: {
     padding: 10,
-    marginTop: 20,
-    marginBottom: 10,
-    marginHorizontal: 10,
-    backgroundColor: "#FECC5D",
+    margin: 15,
+    backgroundColor: "#2196F3",
     flexDirection: "row",
     justifyContent: "space-evenly",
+    borderColor: "#2196F3",
   },
-  saveExam: {
-    width: "45%",
-    padding: 10,
-    marginTop: 20,
-    marginHorizontal: 10,
-    backgroundColor: "#FECC5D",
-    flexDirection: "row",
-    marginBottom: 10,
-    justifyContent: "space-evenly",
-  },
-  buttonText: { color: "#000", fontSize: 15 },
+  buttonText: { color: "#FFFFFF", fontSize: 15 },
 });

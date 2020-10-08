@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, TouchableOpacity, TextInput, Alert, Button } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
-export function PurchaseRequestPage({ navigation }){
+export function PurchaseRequestScreen({ navigation }){
 
 	const [value, onChangeText] = React.useState('');
 	const [val, onChangeItem] = React.useState('');
