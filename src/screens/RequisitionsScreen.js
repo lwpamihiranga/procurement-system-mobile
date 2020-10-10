@@ -1,30 +1,16 @@
 import React, { useState } from "react";
-import uuid from "uuid-random";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
-  Alert,
   TouchableOpacity,
 } from "react-native";
-import {
-  AntDesign,
-  MaterialCommunityIcons,
-  Ionicons,
-} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 import { ScrollView } from "react-native-gesture-handler";
 import DatePicker from "react-native-datepicker";
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Rows,
-  Col,
-  Cols,
-  Cell,
-} from "react-native-table-component";
+import { Table, Row, Rows } from "react-native-table-component";
 
 export function RequisitionsScreen({ navigation }) {
   let [date, setDate] = useState("2016-05-15");
@@ -165,7 +151,7 @@ const styles = StyleSheet.create({
   },
   supplierCompanyDropIcon: {
     position: "absolute",
-    marginTop: 283,
+    marginTop: 213,
     marginStart: 370,
   },
   commentsInput: {
