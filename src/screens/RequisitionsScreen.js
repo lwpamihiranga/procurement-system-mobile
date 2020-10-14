@@ -12,6 +12,9 @@ import { ScrollView } from "react-native-gesture-handler";
 import DatePicker from "react-native-datepicker";
 import { Table, Row, Rows } from "react-native-table-component";
 
+import axios from "axios";
+import Axios from "axios";
+
 export function RequisitionsScreen({ navigation }) {
   let [date, setDate] = useState("2016-05-15");
   let [tableHead, setTableHead] = useState([
@@ -27,6 +30,15 @@ export function RequisitionsScreen({ navigation }) {
     ["0000-003", "8000.00", "5", "40,000", "Approved"],
     ["Total Cost", "290,000"],
   ]);
+
+  // let [siteManagers, setSiteManagers] = useState({});
+
+  // axios.get(`http://192.168.8.101:5000/api/siteManagers/`).then((res) => {
+  //   console.log(res.data);
+  // });
+
+  //check the error
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.topHalf}>
@@ -41,11 +53,6 @@ export function RequisitionsScreen({ navigation }) {
           placeholderTextColor="black"
           multiline={true}
           underlineColorAndroid="transparent"
-        />
-        <TextInput
-          style={styles.orderReferenceNoInput}
-          placeholder="Order Reference No"
-          placeholderTextColor="black"
         />
         <Picker style={styles.supplierCompanyDropdown}>
           {/* set the proper values here */}
@@ -105,6 +112,14 @@ export function RequisitionsScreen({ navigation }) {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Purchase Order</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text
+            style={styles.buttonText}
+            onPress={() => navigation.navigate("PurchaseItemScreen")}
+          >
+            Add an Item
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -133,15 +148,6 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
   },
-  orderReferenceNoInput: {
-    marginTop: 10,
-    borderWidth: 1,
-    textAlign: "justify",
-    borderColor: "#E5E5E5",
-    marginHorizontal: 15,
-    padding: 10,
-    fontSize: 16,
-  },
   supplierCompanyDropdown: {
     marginTop: 10,
     marginBottom: 10,
@@ -151,7 +157,7 @@ const styles = StyleSheet.create({
   },
   supplierCompanyDropIcon: {
     position: "absolute",
-    marginTop: 213,
+    marginTop: 155,
     marginStart: 370,
   },
   commentsInput: {
@@ -190,7 +196,8 @@ const styles = StyleSheet.create({
   text: { margin: 6 },
   button: {
     padding: 10,
-    margin: 15,
+    marginHorizontal: 15,
+    marginVertical: 5,
     backgroundColor: "#2196F3",
     flexDirection: "row",
     justifyContent: "space-evenly",

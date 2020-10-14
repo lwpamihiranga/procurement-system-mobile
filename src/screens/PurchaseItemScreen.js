@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import uuid from "uuid-random";
+import React from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
-  Alert,
   TouchableOpacity,
 } from "react-native";
 import {
@@ -14,9 +12,8 @@ import {
   Ionicons,
 } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
-import { ScrollView } from "react-native-gesture-handler";
 
-export function PurchaseOrderScreen({ navigation }) {
+export function PurchaseItemScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.topHalf}>
