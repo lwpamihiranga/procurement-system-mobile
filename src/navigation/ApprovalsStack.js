@@ -2,16 +2,16 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 
-import { HomeScreen } from "../screens/HomeScreen";
+import { ApprovalsScreen } from "../screens/ApprovalsScreen";
 
 const Stack = createStackNavigator();
 
-export function HomeStack({ navigation }) {
+export function ApprovalsStack({ navigation }) {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Home"
-        component={HomeScreen}
+        name="Approvals"
+        component={ApprovalsScreen}
         options={{
           headerLeft: () => {
             return (
