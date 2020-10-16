@@ -8,17 +8,32 @@ import {
   FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+
+// ??
 import { Picker } from "@react-native-community/picker";
+
 import { ScrollView } from "react-native-gesture-handler";
 import DatePicker from "react-native-datepicker";
+
 import { ItemCard } from "../components/ItemCard";
+import { ItemCardHeading } from "../components/ItemCardHeading";
+import { AddItemCard } from "../components/AddItemCard";
 
 import axios from "axios";
-import Axios from "axios";
+import api from "../api";
 
-import { HOST_WITH_PORT } from "../../environment";
 export function RequisitionsScreen({ navigation }) {
+  //to diable the yellow box warning on the simulator
+  console.disableYellowBox = true;
+
+  //done with these
   let [requisiontionNo, setRequisitionNo] = useState();
+  let [description, setDescription] = useState();
+  let [comment, setComment] = useState();
+  let [date, setDate] = useState("2016-05-15");
+
+  let [itemNo, setItemNo] = useState();
+
   let [suppliers, setSuppliers] = useState([]);
 
   let [reqItems, setReqItems] = useState([
@@ -45,95 +60,31 @@ export function RequisitionsScreen({ navigation }) {
       supplierCode: null,
     },
   ]);
-  let [date, setDate] = useState("2016-05-15");
 
+  //done with these
   useEffect(() => {
-    //   axios.get(`${HOST_WITH_PORT}/api/siteManagers`).then((res) => {
-    //     console.log(res.data);
-    //   });
     onChangeRequisitionNo();
-  });
+    axios
+      .get(api.concat(`/api/suppliers`))
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [setItemNo, setSuppliers, setReqItems]);
+
   let onChangeRequisitionNo = () => {
     setRequisitionNo(
       "R".concat(Math.floor(Math.random() * 10 ** 5).toString())
     );
   };
 
-  let dataObject = [
-    {
-      supplierCode: "SP1",
-      supplierName: "MAS Holdings",
-      address1: "Colombo 3",
-      address2: null,
-      companyNo: "0115632147",
-      mobileNo: "0774856952",
-      fax: null,
-      email: "supplier@mas.com",
-      webSite: null,
-      itemSuppliers: [
-        {
-          itemId: "IT001",
-          item: {
-            itemId: "IT001",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-        {
-          itemId: "IT002",
-          item: {
-            itemId: "IT002",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-        {
-          itemId: "IT003",
-          item: {
-            itemId: "IT003",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-        {
-          itemId: "IT004",
-          item: {
-            itemId: "IT004",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-      ],
-    },
-  ];
+  let onChangeDescription = (value) => {
+    setDescription(value);
+  };
+
+  let onChangeComment = (value) => {
+    setComment(value);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -150,9 +101,10 @@ export function RequisitionsScreen({ navigation }) {
           placeholderTextColor="black"
           multiline={true}
           underlineColorAndroid="transparent"
+          onChangeText={onChangeDescription}
         />
+
         <Picker style={styles.supplierCompanyDropdown}>
-          {/* set the proper values here */}
           <Picker.Item label="Supplier Company" value="-1" />
           <Picker.Item label="A" value="a" />
           <Picker.Item label="B" value="b" />
@@ -164,12 +116,14 @@ export function RequisitionsScreen({ navigation }) {
           color="black"
           style={styles.supplierCompanyDropIcon}
         />
+
         <TextInput
           style={styles.commentsInput}
           placeholder="Comments"
           placeholderTextColor="black"
           multiline={true}
           underlineColorAndroid="transparent"
+          onChangeText={onChangeComment}
         />
         <View style={styles.deliverDate}>
           <Text style={styles.dateText}>Deliver Before</Text>
@@ -200,23 +154,25 @@ export function RequisitionsScreen({ navigation }) {
       </View>
 
       <ScrollView style={styles.itemContainer}>
+        <ItemCardHeading />
         <FlatList
           data={reqItems}
-          renderItem={({ item }) => <ItemCard reqItem={item} />}
+          renderItem={({ item }) => <ItemCard reqItem={item} qty={2} />}
           keyExtractor={(item, index) => index.toString()}
         />
+        <AddItemCard itemNamesAndPrices="" />
       </ScrollView>
       <View style={styles.lowerHalf}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Purchase Order</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button1}>
           <Text
             style={styles.buttonText}
             onPress={() => navigation.navigate("PurchaseItemScreen")}
           >
             Add an Item
           </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button2}>
+          <Text style={styles.buttonText}>Purchase Order</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -284,15 +240,33 @@ const styles = StyleSheet.create({
     marginStart: 20,
   },
   itemContainer: {
-    // flex: 1,
-    // padding: 16,
-    // paddingTop: 30,
-    // backgroundColor: "red",
-    height: 300,
+    elevation: 5,
+    paddingVertical: 10,
+    backgroundColor: "#FFF",
+    marginVertical: 10,
+    marginHorizontal: 15,
+    marginLeft: "2%",
+    width: "96%",
+    shadowColor: "#000",
+    shadowOpacity: 0.9,
+    shadowRadius: 1,
+    shadowOffset: { width: 3, height: 3 },
   },
   head: { height: 40, backgroundColor: "gray" },
   text: { margin: 6 },
-  button: {
+  lowerHalf: {
+    marginTop: 70,
+  },
+  button1: {
+    padding: 10,
+    marginHorizontal: 15,
+    marginVertical: 5,
+    backgroundColor: "#2196F3",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    borderColor: "#2196F3",
+  },
+  button2: {
     padding: 10,
     marginHorizontal: 15,
     marginVertical: 5,
