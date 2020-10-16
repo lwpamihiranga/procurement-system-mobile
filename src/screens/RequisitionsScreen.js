@@ -19,6 +19,8 @@ import { ItemCard } from "../components/ItemCard";
 import { ItemCardHeading } from "../components/ItemCardHeading";
 import { AddItemCard } from "../components/AddItemCard";
 
+// import { ItemCard } from "../components/ItemCard";
+// import { ItemCardHeading } from "../components/ItemCardHeading";
 import axios from "axios";
 import api from "../api";
 
@@ -27,6 +29,7 @@ export function RequisitionsScreen({ navigation }) {
   console.disableYellowBox = true;
 
   //done with these
+  let [itemNo, setItemNo] = useState();
   let [requisiontionNo, setRequisitionNo] = useState();
   let [description, setDescription] = useState();
   let [comment, setComment] = useState();
@@ -35,6 +38,8 @@ export function RequisitionsScreen({ navigation }) {
   let [itemNo, setItemNo] = useState();
 
   let [suppliers, setSuppliers] = useState([]);
+  let [selectedSupplier, setSelectedSupplier] = useState("");
+  let [itemList, setItemList] = useState([]);
 
   let [reqItems, setReqItems] = useState([
     {
@@ -63,14 +68,20 @@ export function RequisitionsScreen({ navigation }) {
 
   //done with these
   useEffect(() => {
-    onChangeRequisitionNo();
+    //sample api call to retrive sites
     axios
       .get(api.concat(`/api/suppliers`))
-      .then((res) => {})
+      .then((res) => {
+        // console.log(res.data);
+        setSuppliers(res.data);
+        // console.log(res.data[0].supplierName);
+      })
       .catch((err) => {
         console.log(err);
       });
-  }, [setItemNo, setSuppliers, setReqItems]);
+  }, [api]);
+
+  // onChangeRequisitionNo();
 
   let onChangeRequisitionNo = () => {
     setRequisitionNo(
@@ -85,7 +96,19 @@ export function RequisitionsScreen({ navigation }) {
   let onChangeComment = (value) => {
     setComment(value);
   };
+  let printItemList = () => {
+    console.log(itemList);
+  };
 
+  let changeSupplier = (supplierName) => {
+    setSelectedSupplier(supplierName);
+
+    suppliers.forEach((supplier) => {
+      if (supplierName === supplier.supplierName) {
+        setItemList(supplier.itemSuppliers);
+      }
+    });
+  };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.topHalf}>
@@ -103,12 +126,24 @@ export function RequisitionsScreen({ navigation }) {
           underlineColorAndroid="transparent"
           onChangeText={onChangeDescription}
         />
-
-        <Picker style={styles.supplierCompanyDropdown}>
-          <Picker.Item label="Supplier Company" value="-1" />
+        <Picker
+          style={styles.supplierCompanyDropdown}
+          selectedValue={selectedSupplier}
+          onValueChange={(itemValue, itemIndex) => changeSupplier(itemValue)}
+        >
+          {/* set the proper values here */}
+          {/* <Picker.Item label="Supplier Company" value="-1" />
           <Picker.Item label="A" value="a" />
           <Picker.Item label="B" value="b" />
-          <Picker.Item label="C" value="c" />
+          <Picker.Item label="C" value="c" /> */}
+          <Picker.Item label="Supplier Company" value="-1" />
+          {suppliers.map((value, key) => (
+            <Picker.Item
+              key={key}
+              label={value.supplierName}
+              value={value.supplierName}
+            />
+          ))}
         </Picker>
         <Ionicons
           name="md-arrow-dropdown"
@@ -163,7 +198,7 @@ export function RequisitionsScreen({ navigation }) {
         <AddItemCard itemNamesAndPrices="" />
       </ScrollView>
       <View style={styles.lowerHalf}>
-        <TouchableOpacity style={styles.button1}>
+        <TouchableOpacity style={styles.button1} onPress={printItemList}>
           <Text
             style={styles.buttonText}
             onPress={() => navigation.navigate("PurchaseItemScreen")}
