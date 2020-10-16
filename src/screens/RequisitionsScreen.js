@@ -11,15 +11,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 import { ScrollView } from "react-native-gesture-handler";
 import DatePicker from "react-native-datepicker";
-import { ItemCard } from "../components/ItemCard";
-
+// import { ItemCard } from "../components/ItemCard";
+// import { ItemCardHeading } from "../components/ItemCardHeading";
 import axios from "axios";
-import Axios from "axios";
+import api from "../api";
 
-import { HOST_WITH_PORT } from "../../environment";
 export function RequisitionsScreen({ navigation }) {
+  //to diable the yellow box warning on the simulator
+  console.disableYellowBox = true;
+
+  let [itemNo, setItemNo] = useState();
   let [requisiontionNo, setRequisitionNo] = useState();
   let [suppliers, setSuppliers] = useState([]);
+  let [selectedSupplier, setSelectedSupplier] = useState("");
+  let [itemList, setItemList] = useState([]);
 
   let [reqItems, setReqItems] = useState([
     {
@@ -48,92 +53,40 @@ export function RequisitionsScreen({ navigation }) {
   let [date, setDate] = useState("2016-05-15");
 
   useEffect(() => {
-    //   axios.get(`${HOST_WITH_PORT}/api/siteManagers`).then((res) => {
-    //     console.log(res.data);
-    //   });
-    onChangeRequisitionNo();
-  });
+    //sample api call to retrive sites
+    axios
+      .get(api.concat(`/api/suppliers`))
+      .then((res) => {
+        // console.log(res.data);
+        setSuppliers(res.data);
+        // console.log(res.data[0].supplierName);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [api]);
+
+  // onChangeRequisitionNo();
+
   let onChangeRequisitionNo = () => {
     setRequisitionNo(
       "R".concat(Math.floor(Math.random() * 10 ** 5).toString())
     );
   };
 
-  let dataObject = [
-    {
-      supplierCode: "SP1",
-      supplierName: "MAS Holdings",
-      address1: "Colombo 3",
-      address2: null,
-      companyNo: "0115632147",
-      mobileNo: "0774856952",
-      fax: null,
-      email: "supplier@mas.com",
-      webSite: null,
-      itemSuppliers: [
-        {
-          itemId: "IT001",
-          item: {
-            itemId: "IT001",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-        {
-          itemId: "IT002",
-          item: {
-            itemId: "IT002",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-        {
-          itemId: "IT003",
-          item: {
-            itemId: "IT003",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-        {
-          itemId: "IT004",
-          item: {
-            itemId: "IT004",
-            itemName: "Roofing Sheet",
-            itemPrice: 200.2,
-            description: "Sheets for roof",
-            unitOfMeasuring: "unit",
-            itemSuppliers: [],
-            purchaseRequisitionItems: null,
-            purchaseOrderItems: null,
-            supplierCode: null,
-          },
-          supplierCode: "SP1",
-        },
-      ],
-    },
-  ];
+  let printItemList = () => {
+    console.log(itemList);
+  };
+
+  let changeSupplier = (supplierName) => {
+    setSelectedSupplier(supplierName);
+
+    suppliers.forEach((supplier) => {
+      if (supplierName === supplier.supplierName) {
+        setItemList(supplier.itemSuppliers);
+      }
+    });
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -151,12 +104,24 @@ export function RequisitionsScreen({ navigation }) {
           multiline={true}
           underlineColorAndroid="transparent"
         />
-        <Picker style={styles.supplierCompanyDropdown}>
+        <Picker
+          style={styles.supplierCompanyDropdown}
+          selectedValue={selectedSupplier}
+          onValueChange={(itemValue, itemIndex) => changeSupplier(itemValue)}
+        >
           {/* set the proper values here */}
-          <Picker.Item label="Supplier Company" value="-1" />
+          {/* <Picker.Item label="Supplier Company" value="-1" />
           <Picker.Item label="A" value="a" />
           <Picker.Item label="B" value="b" />
-          <Picker.Item label="C" value="c" />
+          <Picker.Item label="C" value="c" /> */}
+          <Picker.Item label="Supplier Company" value="-1" />
+          {suppliers.map((value, key) => (
+            <Picker.Item
+              key={key}
+              label={value.supplierName}
+              value={value.supplierName}
+            />
+          ))}
         </Picker>
         <Ionicons
           name="md-arrow-dropdown"
@@ -200,14 +165,15 @@ export function RequisitionsScreen({ navigation }) {
       </View>
 
       <ScrollView style={styles.itemContainer}>
+        {/* <ItemCardHeading /> */}
         <FlatList
           data={reqItems}
-          renderItem={({ item }) => <ItemCard reqItem={item} />}
+          // renderItem={({ item }) => <ItemCard reqItem={item} />}
           keyExtractor={(item, index) => index.toString()}
         />
       </ScrollView>
       <View style={styles.lowerHalf}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={printItemList}>
           <Text style={styles.buttonText}>Purchase Order</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button}>
@@ -284,11 +250,7 @@ const styles = StyleSheet.create({
     marginStart: 20,
   },
   itemContainer: {
-    // flex: 1,
-    // padding: 16,
-    // paddingTop: 30,
-    // backgroundColor: "red",
-    height: 300,
+    paddingVertical: 10,
   },
   head: { height: 40, backgroundColor: "gray" },
   text: { margin: 6 },
