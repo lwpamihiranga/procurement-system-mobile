@@ -15,6 +15,10 @@ export function ApprovalsScreen({ navigation }) {
     { orderNo: "XXXX-007", details: "XXXXX", status: "Pending" },
     { orderNo: "XXXX-008", details: "XXXXX", status: "Pending" },
   ]);
+
+  //to diable the yellow box warning on the simulator
+  console.disableYellowBox = true;
+
   return (
     <View style={styles.container}>
       <FlatList

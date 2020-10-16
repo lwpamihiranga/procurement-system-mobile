@@ -4,7 +4,7 @@ import ImageSliderz from "react-native-image-slideshow";
 
 export function HomeScreen({ navigation }) {
   //to diable the yellow box warning on the simulator
-  // console.disableYellowBox = true;
+  console.disableYellowBox = true;
 
   return (
     <View>
