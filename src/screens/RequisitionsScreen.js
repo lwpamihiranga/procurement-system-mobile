@@ -1,39 +1,148 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 import { ScrollView } from "react-native-gesture-handler";
 import DatePicker from "react-native-datepicker";
-import { Table, Row, Rows } from "react-native-table-component";
+import { ItemCard } from "../components/ItemCard";
 
+import axios from "axios";
+import Axios from "axios";
+
+import { HOST_WITH_PORT } from "../../environment";
 export function RequisitionsScreen({ navigation }) {
+  let [requisiontionNo, setRequisitionNo] = useState();
+  let [suppliers, setSuppliers] = useState([]);
+
+  let [reqItems, setReqItems] = useState([
+    {
+      itemId: "IT004",
+      itemName: "Roofing Sheet",
+      itemPrice: 200.2,
+      description: "Sheets for roof",
+      unitOfMeasuring: "unit",
+      itemSuppliers: [],
+      purchaseRequisitionItems: null,
+      purchaseOrderItems: null,
+      supplierCode: null,
+    },
+    {
+      itemId: "IT002",
+      itemName: "Roofing Sheet",
+      itemPrice: 200.2,
+      description: "Sheets for roof",
+      unitOfMeasuring: "unit",
+      itemSuppliers: [],
+      purchaseRequisitionItems: null,
+      purchaseOrderItems: null,
+      supplierCode: null,
+    },
+  ]);
   let [date, setDate] = useState("2016-05-15");
-  let [tableHead, setTableHead] = useState([
-    "Item No",
-    "Cost",
-    "Quantity",
-    "Total Cost",
-    "Status",
-  ]);
-  let [tableData, setTableData] = useState([
-    ["0000-001", "8000.00", "5", "40,000", "Approved"],
-    ["0000-002", "8000.00", "5", "40,000", "Approved"],
-    ["0000-003", "8000.00", "5", "40,000", "Approved"],
-    ["Total Cost", "290,000"],
-  ]);
+
+  useEffect(() => {
+    //   axios.get(`${HOST_WITH_PORT}/api/siteManagers`).then((res) => {
+    //     console.log(res.data);
+    //   });
+    onChangeRequisitionNo();
+  });
+  let onChangeRequisitionNo = () => {
+    setRequisitionNo(
+      "R".concat(Math.floor(Math.random() * 10 ** 5).toString())
+    );
+  };
+
+  let dataObject = [
+    {
+      supplierCode: "SP1",
+      supplierName: "MAS Holdings",
+      address1: "Colombo 3",
+      address2: null,
+      companyNo: "0115632147",
+      mobileNo: "0774856952",
+      fax: null,
+      email: "supplier@mas.com",
+      webSite: null,
+      itemSuppliers: [
+        {
+          itemId: "IT001",
+          item: {
+            itemId: "IT001",
+            itemName: "Roofing Sheet",
+            itemPrice: 200.2,
+            description: "Sheets for roof",
+            unitOfMeasuring: "unit",
+            itemSuppliers: [],
+            purchaseRequisitionItems: null,
+            purchaseOrderItems: null,
+            supplierCode: null,
+          },
+          supplierCode: "SP1",
+        },
+        {
+          itemId: "IT002",
+          item: {
+            itemId: "IT002",
+            itemName: "Roofing Sheet",
+            itemPrice: 200.2,
+            description: "Sheets for roof",
+            unitOfMeasuring: "unit",
+            itemSuppliers: [],
+            purchaseRequisitionItems: null,
+            purchaseOrderItems: null,
+            supplierCode: null,
+          },
+          supplierCode: "SP1",
+        },
+        {
+          itemId: "IT003",
+          item: {
+            itemId: "IT003",
+            itemName: "Roofing Sheet",
+            itemPrice: 200.2,
+            description: "Sheets for roof",
+            unitOfMeasuring: "unit",
+            itemSuppliers: [],
+            purchaseRequisitionItems: null,
+            purchaseOrderItems: null,
+            supplierCode: null,
+          },
+          supplierCode: "SP1",
+        },
+        {
+          itemId: "IT004",
+          item: {
+            itemId: "IT004",
+            itemName: "Roofing Sheet",
+            itemPrice: 200.2,
+            description: "Sheets for roof",
+            unitOfMeasuring: "unit",
+            itemSuppliers: [],
+            purchaseRequisitionItems: null,
+            purchaseOrderItems: null,
+            supplierCode: null,
+          },
+          supplierCode: "SP1",
+        },
+      ],
+    },
+  ];
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.topHalf}>
         <TextInput
           style={styles.requisitionNoInput}
-          placeholder="Requisition No"
+          placeholder={requisiontionNo}
           placeholderTextColor="black"
+          value={requisiontionNo}
         />
         <TextInput
           style={styles.descriptionInput}
@@ -41,11 +150,6 @@ export function RequisitionsScreen({ navigation }) {
           placeholderTextColor="black"
           multiline={true}
           underlineColorAndroid="transparent"
-        />
-        <TextInput
-          style={styles.orderReferenceNoInput}
-          placeholder="Order Reference No"
-          placeholderTextColor="black"
         />
         <Picker style={styles.supplierCompanyDropdown}>
           {/* set the proper values here */}
@@ -95,15 +199,24 @@ export function RequisitionsScreen({ navigation }) {
         </View>
       </View>
 
-      <ScrollView style={styles.tableContainer}>
-        <Table borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}>
-          <Row data={tableHead} style={styles.head} textStyle={styles.text} />
-          <Rows data={tableData} textStyle={styles.text} />
-        </Table>
+      <ScrollView style={styles.itemContainer}>
+        <FlatList
+          data={reqItems}
+          renderItem={({ item }) => <ItemCard reqItem={item} />}
+          keyExtractor={(item, index) => index.toString()}
+        />
       </ScrollView>
       <View style={styles.lowerHalf}>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Purchase Order</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text
+            style={styles.buttonText}
+            onPress={() => navigation.navigate("PurchaseItemScreen")}
+          >
+            Add an Item
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -133,15 +246,6 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
   },
-  orderReferenceNoInput: {
-    marginTop: 10,
-    borderWidth: 1,
-    textAlign: "justify",
-    borderColor: "#E5E5E5",
-    marginHorizontal: 15,
-    padding: 10,
-    fontSize: 16,
-  },
   supplierCompanyDropdown: {
     marginTop: 10,
     marginBottom: 10,
@@ -151,7 +255,7 @@ const styles = StyleSheet.create({
   },
   supplierCompanyDropIcon: {
     position: "absolute",
-    marginTop: 213,
+    marginTop: 155,
     marginStart: 370,
   },
   commentsInput: {
@@ -179,18 +283,19 @@ const styles = StyleSheet.create({
     alignContent: "flex-end",
     marginStart: 20,
   },
-  tableContainer: {
-    flex: 1,
-    padding: 16,
-    paddingTop: 30,
-    backgroundColor: "#fff",
+  itemContainer: {
+    // flex: 1,
+    // padding: 16,
+    // paddingTop: 30,
+    // backgroundColor: "red",
     height: 300,
   },
   head: { height: 40, backgroundColor: "gray" },
   text: { margin: 6 },
   button: {
     padding: 10,
-    margin: 15,
+    marginHorizontal: 15,
+    marginVertical: 5,
     backgroundColor: "#2196F3",
     flexDirection: "row",
     justifyContent: "space-evenly",

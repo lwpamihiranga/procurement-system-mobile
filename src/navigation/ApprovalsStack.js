@@ -3,6 +3,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 
 import { ApprovalsScreen } from "../screens/ApprovalsScreen";
+import { RequisitionsScreen } from "../screens/RequisitionsScreen";
+import { PurchaseItemScreen } from "../screens/PurchaseItemScreen";
 
 const Stack = createStackNavigator();
 
@@ -24,6 +26,22 @@ export function ApprovalsStack({ navigation }) {
             );
           },
           headerLeftContainerStyle: { paddingLeft: 10 },
+        }}
+      />
+      <Stack.Screen
+        name="RequisitionsScreen"
+        component={RequisitionsScreen}
+        options={{
+          title: "Purchase a Requisition",
+          headerTitleAlign: "center",
+        }}
+      />
+      <Stack.Screen
+        name="PurchaseItemScreen"
+        component={PurchaseItemScreen}
+        options={{
+          title: "Add Item to Requisition Order",
+          headerTitleAlign: "center",
         }}
       />
     </Stack.Navigator>
