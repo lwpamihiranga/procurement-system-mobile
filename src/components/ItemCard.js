@@ -3,50 +3,37 @@ import { StyleSheet, Text, View, TextInput } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 export function ItemCard({ reqItem }) {
-  const [quantity, setQuantity] = useState(0);
-
-  let onChangeQuantity = (value) => {
-    setQuantity(value);
-  };
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.content}>{reqItem.itemName}</Text>
-        <Text style={styles.content}>{reqItem.itemPrice}</Text>
-        <TextInput
-          style={styles.content}
-          placeholder={quantity}
-          placeholderTextColor="black"
-          onChangeText={onChangeQuantity}
-        />
-        <Text style={styles.content}>{quantity * reqItem.itemPrice}</Text>
+        <Text style={styles.contentName}>{reqItem.itemName}</Text>
+        <Text style={styles.contentPrice}>{reqItem.itemPrice}</Text>
+        <Text style={styles.contentQty}>{reqItem.itemCount}</Text>
+        <Text style={styles.contentTotal}>
+          {!isNaN(reqItem.itemCount * reqItem.itemPrice) &&
+            reqItem.itemCount * reqItem.itemPrice}
+        </Text>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 15,
-  },
   card: {
-    backgroundColor: "#fff",
-    marginBottom: 5,
-    marginLeft: "2%",
-    width: "96%",
-    shadowColor: "#000",
-    shadowOpacity: 0.9,
-    shadowRadius: 1,
-    shadowOffset: { width: 3, height: 3 },
-    elevation: 5,
-    padding: 10,
+    flex: 1,
     flexDirection: "row",
+    justifyContent: "space-around",
+    // marginVertical: 10,
   },
-  content: {
-    marginHorizontal: 10,
+  contentName: {},
+  contentPrice: {
+    marginEnd: 5,
   },
-  status: {
-    fontSize: 16,
+  contentQty: {
+    fontSize: 15,
+    marginEnd: 5,
+  },
+  contentTotal: {
+    marginEnd: 5,
   },
 });
