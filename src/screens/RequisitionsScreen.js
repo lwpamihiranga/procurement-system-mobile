@@ -13,75 +13,49 @@ import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-community/picker";
 
 import { ScrollView } from "react-native-gesture-handler";
-import DatePicker from "react-native-datepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { ItemCard } from "../components/ItemCard";
 import { ItemCardHeading } from "../components/ItemCardHeading";
 import { AddItemCard } from "../components/AddItemCard";
+import { TotalCard } from "../components/TotalCard";
 
 // import { ItemCard } from "../components/ItemCard";
 // import { ItemCardHeading } from "../components/ItemCardHeading";
 import axios from "axios";
 import api from "../api";
+import { NoItemsCard } from "../components/NoItemsCard";
 
 export function RequisitionsScreen({ navigation }) {
   //to diable the yellow box warning on the simulator
   console.disableYellowBox = true;
 
   //done with these
-  let [itemNo, setItemNo] = useState();
+  // let inputBlock;
+  // let [itemNo, setItemNo] = useState();
   let [requisiontionNo, setRequisitionNo] = useState();
   let [description, setDescription] = useState();
   let [comment, setComment] = useState();
-  let [date, setDate] = useState("2016-05-15");
-
-  let [itemNo, setItemNo] = useState();
+  let [date, setDate] = useState(new Date(1598051730000));
 
   let [suppliers, setSuppliers] = useState([]);
   let [selectedSupplier, setSelectedSupplier] = useState("");
   let [itemList, setItemList] = useState([]);
+  let [addedItemList, setAddedItemList] = useState([{}]);
+  let [totalPrice, setTotalPrice] = useState("Please Items to the Order");
+  let url;
 
-  let [reqItems, setReqItems] = useState([
-    {
-      itemId: "IT004",
-      itemName: "Roofing Sheet",
-      itemPrice: 200.2,
-      description: "Sheets for roof",
-      unitOfMeasuring: "unit",
-      itemSuppliers: [],
-      purchaseRequisitionItems: null,
-      purchaseOrderItems: null,
-      supplierCode: null,
-    },
-    {
-      itemId: "IT002",
-      itemName: "Roofing Sheet",
-      itemPrice: 200.2,
-      description: "Sheets for roof",
-      unitOfMeasuring: "unit",
-      itemSuppliers: [],
-      purchaseRequisitionItems: null,
-      purchaseOrderItems: null,
-      supplierCode: null,
-    },
-  ]);
-
-  //done with these
   useEffect(() => {
-    //sample api call to retrive sites
+    onChangeRequisitionNo();
     axios
       .get(api.concat(`/api/suppliers`))
       .then((res) => {
-        // console.log(res.data);
         setSuppliers(res.data);
-        // console.log(res.data[0].supplierName);
       })
       .catch((err) => {
         console.log(err);
       });
   }, [api]);
-
-  // onChangeRequisitionNo();
 
   let onChangeRequisitionNo = () => {
     setRequisitionNo(
@@ -96,19 +70,72 @@ export function RequisitionsScreen({ navigation }) {
   let onChangeComment = (value) => {
     setComment(value);
   };
-  let printItemList = () => {
-    console.log(itemList);
-  };
 
   let changeSupplier = (supplierName) => {
     setSelectedSupplier(supplierName);
-
     suppliers.forEach((supplier) => {
       if (supplierName === supplier.supplierName) {
         setItemList(supplier.itemSuppliers);
       }
     });
   };
+
+  let addToAddedItemList = (item) => {
+    setAddedItemList([...addedItemList, item]);
+  };
+
+  useEffect(() => {
+    getTotalPrice();
+  }, [addedItemList]);
+
+  //show the total
+  let getTotalPrice = (value) => {
+    // setTotalPrice(totalPrice + value);
+    // console.log(totalPrice);
+  };
+
+  let createRequisitionOrder = () => {
+    let reqOrder = {
+      requisitionNo: requisiontionNo,
+      supplier: {
+        supplierName: selectedSupplier,
+      },
+      deliverBefore: date,
+      totalCost: totalPrice,
+      status: description,
+      comments: comment,
+      purchaseRequisitionItems: addedItemList,
+    };
+
+    axios
+      .post(api.concat("/api/purchaseRequisitions"), {
+        SiteManagerId: "EMP1",
+        SupplierCode: "SP1",
+        SiteCode: "SITE001",
+        ShippingAddress: "Malabe",
+        TotalCost: 1000.0,
+        Status: "Pending",
+        Comments: "Immediate request",
+        ItemIds: ["IT001", "IT002", "IT003"],
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  let onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+    // console.log(currentDate);
+  };
+  const [show, setShow] = useState(false);
+  const showDatePicker = () => {
+    setShow(true);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.topHalf}>
@@ -117,6 +144,7 @@ export function RequisitionsScreen({ navigation }) {
           placeholder={requisiontionNo}
           placeholderTextColor="black"
           value={requisiontionNo}
+          editable={false}
         />
         <TextInput
           style={styles.descriptionInput}
@@ -131,11 +159,6 @@ export function RequisitionsScreen({ navigation }) {
           selectedValue={selectedSupplier}
           onValueChange={(itemValue, itemIndex) => changeSupplier(itemValue)}
         >
-          {/* set the proper values here */}
-          {/* <Picker.Item label="Supplier Company" value="-1" />
-          <Picker.Item label="A" value="a" />
-          <Picker.Item label="B" value="b" />
-          <Picker.Item label="C" value="c" /> */}
           <Picker.Item label="Supplier Company" value="-1" />
           {suppliers.map((value, key) => (
             <Picker.Item
@@ -160,53 +183,49 @@ export function RequisitionsScreen({ navigation }) {
           underlineColorAndroid="transparent"
           onChangeText={onChangeComment}
         />
-        <View style={styles.deliverDate}>
-          <Text style={styles.dateText}>Deliver Before</Text>
-          <DatePicker
-            style={styles.dateInput}
-            date={date}
-            mode="date"
-            placeholder="select date"
-            format="YYYY-MM-DD"
-            minDate="2016-05-01"
-            maxDate="2016-06-01"
-            confirmBtnText="Confirm"
-            cancelBtnText="Cancel"
-            customStyles={{
-              dateIcon: {
-                position: "absolute",
-                left: 0,
-                top: 4,
-                marginLeft: 0,
-              },
-              dateInput: {
-                marginLeft: 36,
-              },
-            }}
-            onDateChange={setDate}
-          />
-        </View>
+        {/* <TouchableOpacity style={styles.commentsInput} onPress={showDatePicker}>
+          <Text style={styles.dateText}>
+            Deliver Before {date.getFullYear().toString()}/
+            {date.getMonth().toString()}/{date.getDate().toString()}
+          </Text>
+          {show && (
+            <DateTimePicker
+              style={styles.deliverDate}
+              testID="dateTimePicker"
+              value={date}
+              mode="date"
+              // is24Hour={true}
+              // display="default"
+              onChange={onChangeDate}
+            />
+          )}
+        </TouchableOpacity> */}
       </View>
 
       <ScrollView style={styles.itemContainer}>
         <ItemCardHeading />
         <FlatList
-          data={reqItems}
-          renderItem={({ item }) => <ItemCard reqItem={item} qty={2} />}
+          data={addedItemList}
+          renderItem={({ item }) => <ItemCard reqItem={item} />}
           keyExtractor={(item, index) => index.toString()}
         />
-        <AddItemCard itemNamesAndPrices="" />
+        <TotalCard totalPrice={getTotalPrice()} />
       </ScrollView>
       <View style={styles.lowerHalf}>
-        <TouchableOpacity style={styles.button1} onPress={printItemList}>
-          <Text
-            style={styles.buttonText}
-            onPress={() => navigation.navigate("PurchaseItemScreen")}
-          >
-            Add an Item
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button2}>
+        {itemList.length > 0 ? (
+          <AddItemCard
+            itemList={itemList}
+            addToAddedItemList={addToAddedItemList}
+            getTotalPrice={getTotalPrice}
+          />
+        ) : (
+          <NoItemsCard />
+        )}
+
+        <TouchableOpacity
+          style={styles.button2}
+          onPress={createRequisitionOrder}
+        >
           <Text style={styles.buttonText}>Purchase Order</Text>
         </TouchableOpacity>
       </View>
@@ -224,6 +243,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     textAlign: "justify",
     borderColor: "#E5E5E5",
+    backgroundColor: "#E5E5E5",
     marginHorizontal: 15,
     padding: 10,
     fontSize: 16,
@@ -276,12 +296,12 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     elevation: 5,
-    paddingVertical: 10,
+    // paddingVertical: 10,
     backgroundColor: "#FFF",
     marginVertical: 10,
     marginHorizontal: 15,
-    marginLeft: "2%",
-    width: "96%",
+    marginLeft: "4%",
+    width: "92%",
     shadowColor: "#000",
     shadowOpacity: 0.9,
     shadowRadius: 1,
@@ -289,18 +309,6 @@ const styles = StyleSheet.create({
   },
   head: { height: 40, backgroundColor: "gray" },
   text: { margin: 6 },
-  lowerHalf: {
-    marginTop: 70,
-  },
-  button1: {
-    padding: 10,
-    marginHorizontal: 15,
-    marginVertical: 5,
-    backgroundColor: "#2196F3",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    borderColor: "#2196F3",
-  },
   button2: {
     padding: 10,
     marginHorizontal: 15,

@@ -1,13 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export function ItemCardHeading() {
+export function NoItemsCard() {
   return (
     <View style={styles.card}>
-      <Text style={styles.content}>Item Name</Text>
-      <Text style={styles.content}>Item Price</Text>
-      <Text style={styles.content}>Quantity</Text>
-      <Text style={styles.content}>Total Price</Text>
+      <Text style={styles.content}>This supplier has no items</Text>
     </View>
   );
 }
